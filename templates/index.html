@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control del Emulador</title>
+    <!-- Enlace al archivo style.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Estilos para los botones */
+        .btn {
+            background-color: black;
+            color: #FFD700; /* Color dorado */
+            border: 2px solid #FFD700; /* Borde dorado */
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 20px auto; /* Margen automático para centrar */
+            display: block;
+            border-radius: 10px; /* Bordes redondeados */
+        }
+        /* Estilos para los banners */
+        .banner-left,
+        .banner-right {
+            position: fixed; /* Fijar la posición */
+            top: 0;
+            bottom: 0;
+            width: 600px; /* Ancho de las imágenes */
+            height: 100%; /* Altura igual al 100% del cuerpo */
+            z-index: -1; /* Enviar las imágenes detrás del contenido */
+            display: block; /* Mostrar las imágenes */
+        }
+        .banner-left {
+            left: 0; /* Posición a la izquierda */
+        }
+        .banner-right {
+            right: 0; /* Posición a la derecha */
+        }
+    </style>
+</head>
+<body>
+    <!-- Imagen a la izquierda -->
+    <img src="{{ url_for('static', filename='banners/imagen1.jpg') }}" alt="Banner 1" class="banner-left">
+    <!-- Imagen a la derecha -->
+    <img src="{{ url_for('static', filename='banners/imagen2.jpg') }}" alt="Banner 2" class="banner-right"> 
+
+    <h1>Control del Emulador</h1>
+    <!-- Botón para iniciar Pico-8 -->
+    <button type="button" id="startEmulatorBtnPico8" class="btn">Iniciar Pico-8</button>
+    <!-- Botón para iniciar SNES -->
+    <button type="button" id="startEmulatorBtnSNES" class="btn">Iniciar SNES</button>
+    <!-- Botón para iniciar GBA -->
+    <button type="button" id="startEmulatorBtnGBA" class="btn">Iniciar GBA</button>
+    <!-- Botón para iniciar SEGA -->
+    <button type="button" id="startEmulatorBtnSEGA" class="btn">Iniciar SEGA</button>
+    <!-- Botón para iniciar PSX -->
+    <button type="button" id="startEmulatorBtnPSX" class="btn">Iniciar PSX</button>
+    <!-- Botón para iniciar N64 -->
+    <button type="button" id="startEmulatorBtnN64" class="btn">Iniciar N64</button>
+    <!-- Botón para cerrar el emulador -->
+    <button type="button" id="closeEmulatorBtn" class="btn" style="display: none;">Cerrar Emulador</button>
+
+    <!-- Contenedor para el emulador -->
+    <div id="emulatorContainer">
+        <iframe id="emulatorIframe" width="800" height="600" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        // Función para iniciar el emulador Pico-8
+        document.getElementById("startEmulatorBtnPico8").addEventListener("click", function() {
+            startEmulator("https://www.lexaloffle.com/pico-8.php");
+        });
+
+        // Función para iniciar el emulador SNES
+        document.getElementById("startEmulatorBtnSNES").addEventListener("click", function() {
+            startEmulator("https://www.playroms.net/snes-roms/");
+        });
+
+        // Función para iniciar el emulador GBA
+        document.getElementById("startEmulatorBtnGBA").addEventListener("click", function() {
+            startEmulator("https://www.playroms.net/gba-roms/");
+        });
+
+        // Función para iniciar el emulador SEGA
+        document.getElementById("startEmulatorBtnSEGA").addEventListener("click", function() {
+            startEmulator("https://www.playroms.net/sega-roms/");
+        });
+
+        // Función para iniciar el emulador PSX
+        document.getElementById("startEmulatorBtnPSX").addEventListener("click", function() {
+            startEmulator("https://www.playroms.net/ps1-roms/");
+        });
+
+        // Función para iniciar el emulador N64
+        document.getElementById("startEmulatorBtnN64").addEventListener("click", function() {
+            startEmulator("https://www.playroms.net/n64-roms/");
+        });
+
+        // Función para cerrar el emulador
+        document.getElementById("closeEmulatorBtn").addEventListener("click", function() {
+            document.getElementById("emulatorContainer").style.display = "none";
+            document.getElementById("emulatorIframe").src = "";
+            document.getElementById("startEmulatorBtnPico8").style.display = "block";
+            document.getElementById("startEmulatorBtnSNES").style.display = "block";
+            document.getElementById("startEmulatorBtnGBA").style.display = "block";
+            document.getElementById("startEmulatorBtnSEGA").style.display = "block";
+            document.getElementById("startEmulatorBtnPSX").style.display = "block";
+            document.getElementById("startEmulatorBtnN64").style.display = "block";
+            document.getElementById("closeEmulatorBtn").style.display = "none";
+        });
+
+        // Función para iniciar el emulador
+        function startEmulator(url) {
+            document.getElementById("emulatorContainer").style.display = "block";
+            document.getElementById("emulatorIframe").src = url;
+            document.getElementById("startEmulatorBtnPico8").style.display = "none";
+            document.getElementById("startEmulatorBtnSNES").style.display = "none";
+            document.getElementById("startEmulatorBtnGBA").style.display = "none";
+            document.getElementById("startEmulatorBtnSEGA").style.display = "none";
+            document.getElementById("startEmulatorBtnPSX").style.display = "none";
+            document.getElementById("startEmulatorBtnN64").style.display = "none";
+            document.getElementById("closeEmulatorBtn").style.display = "block";
+        }
+    </script>
+</body>
+</html>

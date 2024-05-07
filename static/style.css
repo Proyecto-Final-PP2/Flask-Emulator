@@ -1,0 +1,48 @@
+body {
+    background-color: black;
+    color: #FFD700; /* Color dorado */
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 50px; /* Espacio superior */
+}
+
+button {
+    display: block;
+    margin: 0 auto;
+    background-color: black;
+    color: #FFD700; /* Color dorado */
+    border: none;
+    padding: 20px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    margin-top: 20px; /* Espacio superior */
+}
+
+#emulatorContainer {
+    display: none;
+    width: 600px; /* Ajusta el tamaño del contenedor según tus necesidades */
+    height: 600px; /* Misma altura que el ancho para que sea un cuadrado */
+    margin: 0 auto; /* Centrar el contenedor */
+    margin-top: 20px; /* Espacio superior */
+}
+
+#emulatorIframe {
+    width: 100%;
+    height: 100%;
+}
+
+.banner-left,
+.banner-right {
+    width: 350px; /* Ancho de las imágenes */
+    height: 100%; /* Altura igual al 100% del cuerpo */
+    z-index: -1; /* Enviar las imágenes detrás del contenido */
+    display: block; /* Mostrar las imágenes */
+}
+
+.banner-left {
+    left: 0; /* Posición a la izquierda */
+}
+
+.banner-right {
+    right: 0; /* Posición a la derecha */
+}
