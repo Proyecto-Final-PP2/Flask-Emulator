@@ -7,6 +7,13 @@
     <!-- Enlace al archivo style.css -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        /* Estilos para los botones y el fondo */
+        body {
+            background-color: black;
+            color: yellow;
+            font-family: Arial, sans-serif;
+        }
+
         /* Estilos para los botones */
         .btn {
             background-color: black;
@@ -68,36 +75,57 @@
     <script>
         // Función para iniciar el emulador Pico-8
         document.getElementById("startEmulatorBtnPico8").addEventListener("click", function() {
-            startEmulator("https://www.lexaloffle.com/pico-8.php");
+            startEmulator("Pico-8");
         });
 
         // Función para iniciar el emulador SNES
         document.getElementById("startEmulatorBtnSNES").addEventListener("click", function() {
-            startEmulator("https://www.playroms.net/snes-roms/");
+            startEmulator("SNES");
         });
 
         // Función para iniciar el emulador GBA
         document.getElementById("startEmulatorBtnGBA").addEventListener("click", function() {
-            startEmulator("https://www.playroms.net/gba-roms/");
+            startEmulator("GBA");
         });
 
         // Función para iniciar el emulador SEGA
         document.getElementById("startEmulatorBtnSEGA").addEventListener("click", function() {
-            startEmulator("https://www.playroms.net/sega-roms/");
+            startEmulator("SEGA");
         });
 
         // Función para iniciar el emulador PSX
         document.getElementById("startEmulatorBtnPSX").addEventListener("click", function() {
-            startEmulator("https://www.playroms.net/ps1-roms/");
+            startEmulator("PSX");
         });
 
         // Función para iniciar el emulador N64
         document.getElementById("startEmulatorBtnN64").addEventListener("click", function() {
-            startEmulator("https://www.playroms.net/n64-roms/");
+            startEmulator("N64");
         });
 
         // Función para cerrar el emulador
         document.getElementById("closeEmulatorBtn").addEventListener("click", function() {
+            closeEmulator();
+        });
+
+        // Función para iniciar o registrar el emulador
+        function startEmulator(emulator) {
+            document.getElementById("emulatorContainer").style.display = "block";
+            document.getElementById("emulatorIframe").src = getEmulatorUrl(emulator);
+            document.getElementById("startEmulatorBtnPico8").style.display = "none";
+            document.getElementById("startEmulatorBtnSNES").style.display = "none";
+            document.getElementById("startEmulatorBtnGBA").style.display = "none";
+            document.getElementById("startEmulatorBtnSEGA").style.display = "none";
+            document.getElementById("startEmulatorBtnPSX").style.display = "none";
+            document.getElementById("startEmulatorBtnN64").style.display = "none";
+            document.getElementById("closeEmulatorBtn").style.display = "block";
+
+            // Enviar registro al servidor
+            sendEmulatorAction(emulator, 'open');
+        }
+
+        // Función para cerrar el emulador
+        function closeEmulator() {
             document.getElementById("emulatorContainer").style.display = "none";
             document.getElementById("emulatorIframe").src = "";
             document.getElementById("startEmulatorBtnPico8").style.display = "block";
@@ -107,19 +135,69 @@
             document.getElementById("startEmulatorBtnPSX").style.display = "block";
             document.getElementById("startEmulatorBtnN64").style.display = "block";
             document.getElementById("closeEmulatorBtn").style.display = "none";
-        });
 
-        // Función para iniciar el emulador
-        function startEmulator(url) {
-            document.getElementById("emulatorContainer").style.display = "block";
-            document.getElementById("emulatorIframe").src = url;
-            document.getElementById("startEmulatorBtnPico8").style.display = "none";
-            document.getElementById("startEmulatorBtnSNES").style.display = "none";
-            document.getElementById("startEmulatorBtnGBA").style.display = "none";
-            document.getElementById("startEmulatorBtnSEGA").style.display = "none";
-            document.getElementById("startEmulatorBtnPSX").style.display = "none";
-            document.getElementById("startEmulatorBtnN64").style.display = "none";
-            document.getElementById("closeEmulatorBtn").style.display = "block";
+            // Enviar registro al servidor
+            sendEmulatorAction(getActiveEmulator(), 'close');
+        }
+
+        // Función para obtener la URL del emulador
+        function getEmulatorUrl(emulator) {
+            switch (emulator) {
+                case 'Pico-8':
+                    return "https://www.lexaloffle.com/pico-8.php";
+                case 'SNES':
+                    return "https://www.playroms.net/snes-roms/";
+                case 'GBA':
+                    return "https://www.playroms.net/gba-roms/";
+                case 'SEGA':
+                    return "https://www.playroms.net/sega-roms/";
+                case 'PSX':
+                    return "https://www.playroms.net/ps1-roms/";
+                case 'N64':
+                    return "https://www.playroms.net/n64-roms/";
+                default:
+                    return "";
+            }
+        }
+
+        // Función para obtener el emulador activo
+        function getActiveEmulator() {
+            if (document.getElementById("emulatorIframe").src.includes("pico-8")) {
+                return "Pico-8";
+            } else if (document.getElementById("emulatorIframe").src.includes("snes")) {
+                return "SNES";
+            } else if (document.getElementById("emulatorIframe").src.includes("gba")) {
+                return "GBA";
+            } else if (document.getElementById("emulatorIframe").src.includes("sega")) {
+                return "SEGA";
+            } else if (document.getElementById("emulatorIframe").src.includes("ps1")) {
+                return "PSX";
+            } else if (document.getElementById("emulatorIframe").src.includes("n64")) {
+                return "N64";
+            } else {
+                return "";
+            }
+        }
+
+        // Función para enviar la acción del emulador al servidor
+        function sendEmulatorAction(emulator, action) {
+            fetch('/emulator-action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    emulator: emulator,
+                    action: action
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta del servidor:', data);
+            })
+            .catch(error => {
+                console.error('Error al enviar la acción al servidor:', error);
+            });
         }
     </script>
 </body>
