@@ -8,6 +8,7 @@ app.secret_key = 'your_secret_key'
 users = {
     'user1': {
         'username': 'user1',
+        'email': 'user1@example.com',
         'password': generate_password_hash('password1')  # Ejemplo de hash de contraseña
     }
 }
@@ -15,30 +16,36 @@ users = {
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username in users and check_password_hash(users[username]['password'], password):
-            session['username'] = username
-            return redirect(url_for('index'))
-        else:
-            flash('Invalid username or password')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # Iterar sobre los usuarios para verificar el email y la contraseña
+        for user_data in users.values():
+            if user_data.get('email') == email and check_password_hash(user_data['password'], password):
+                session['username'] = user_data['username']
+                return redirect(url_for('index'))
+        
+        flash('Invalid email or password')
     return render_template('login.html')
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username in users:
-            flash('Username already exists')
-        else:
-            users[username] = {
-                'username': username,
-                'password': generate_password_hash(password)  # Ejemplo de hash de contraseña
-            }
-            flash('Registration successful. Please login.')
-            return redirect(url_for('login'))
-    return render_template('register.html')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    
+    if username in users:
+        flash('Username already exists')
+    else:
+        users[username] = {
+            'username': username,
+            'email': email,
+            'password': generate_password_hash(password)  # Ejemplo de hash de contraseña
+        }
+        flash('Registration successful. Please login.')
+        return redirect(url_for('login'))
+    
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
