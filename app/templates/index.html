@@ -7,11 +7,27 @@
     <!-- Enlace al archivo style.css -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        /* Estilos para los botones y el fondo */
+        /* Estilos para el body */
         body {
             background-color: black;
             color: yellow;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Altura completa de la ventana */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center; /* Centrar el texto */
+            overflow: hidden; /* Evitar desplazamiento */
+        }
+
+        /* Estilos para el contenedor de los botones */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         /* Estilos para los botones */
@@ -22,10 +38,11 @@
             padding: 20px 40px;
             font-size: 24px;
             cursor: pointer;
-            margin: 20px auto; /* Margen automático para centrar */
-            display: block;
+            margin: 10px; /* Margen entre botones */
+            display: inline-block; /* Alinear los botones en línea */
             border-radius: 10px; /* Bordes redondeados */
         }
+
         /* Estilos para los banners */
         .banner-left,
         .banner-right {
@@ -36,6 +53,7 @@
             height: 100%; /* Altura igual al 100% del cuerpo */
             z-index: -1; /* Enviar las imágenes detrás del contenido */
             display: block; /* Mostrar las imágenes */
+            transition: opacity 0.5s; /* Transición para el cambio de visibilidad */
         }
         .banner-left {
             left: 0; /* Posición a la izquierda */
@@ -43,29 +61,32 @@
         .banner-right {
             right: 0; /* Posición a la derecha */
         }
+        /* Estilos para el contenedor del emulador */
+        #emulatorContainer {
+            display: none; /* Ocultar el contenedor por defecto */
+            text-align: center;
+            margin-top: 20px; /* Espacio superior para el contenedor del emulador */
+        }
     </style>
 </head>
 <body>
     <!-- Imagen a la izquierda -->
-    <img src="{{ url_for('static', filename='banners/imagen1.jpg') }}" alt="Banner 1" class="banner-left">
+    <img src="{{ url_for('static', filename='banners/imagen1.jpg') }}" alt="Banner 1" class="banner-left" id="bannerLeft">
     <!-- Imagen a la derecha -->
-    <img src="{{ url_for('static', filename='banners/imagen2.jpg') }}" alt="Banner 2" class="banner-right"> 
+    <img src="{{ url_for('static', filename='banners/imagen2.jpg') }}" alt="Banner 2" class="banner-right" id="bannerRight"> 
 
-    <h1>Control del Emulador</h1>
-    <!-- Botón para iniciar Pico-8 -->
-    <button type="button" id="startEmulatorBtnPico8" class="btn">Iniciar Pico-8</button>
-    <!-- Botón para iniciar SNES -->
-    <button type="button" id="startEmulatorBtnSNES" class="btn">Iniciar SNES</button>
-    <!-- Botón para iniciar GBA -->
-    <button type="button" id="startEmulatorBtnGBA" class="btn">Iniciar GBA</button>
-    <!-- Botón para iniciar SEGA -->
-    <button type="button" id="startEmulatorBtnSEGA" class="btn">Iniciar SEGA</button>
-    <!-- Botón para iniciar PSX -->
-    <button type="button" id="startEmulatorBtnPSX" class="btn">Iniciar PSX</button>
-    <!-- Botón para iniciar N64 -->
-    <button type="button" id="startEmulatorBtnN64" class="btn">Iniciar N64</button>
-    <!-- Botón para cerrar el emulador -->
-    <button type="button" id="closeEmulatorBtn" class="btn" style="display: none;">Cerrar Emulador</button>
+    <div class="button-container">
+        <h1>Control del Emulador</h1>
+        <!-- Botones para iniciar emuladores -->
+        <button type="button" id="startEmulatorBtnPico8" class="btn">Iniciar Pico-8</button>
+        <button type="button" id="startEmulatorBtnSNES" class="btn">Iniciar SNES</button>
+        <button type="button" id="startEmulatorBtnGBA" class="btn">Iniciar GBA</button>
+        <button type="button" id="startEmulatorBtnSEGA" class="btn">Iniciar SEGA</button>
+        <button type="button" id="startEmulatorBtnPSX" class="btn">Iniciar PSX</button>
+        <button type="button" id="startEmulatorBtnN64" class="btn">Iniciar N64</button>
+        <!-- Botón para cerrar el emulador -->
+        <button type="button" id="closeEmulatorBtn" class="btn" style="display: none;">Cerrar Emulador</button>
+    </div>
 
     <!-- Contenedor para el emulador -->
     <div id="emulatorContainer">
@@ -73,74 +94,43 @@
     </div>
 
     <script>
-        // Función para iniciar el emulador Pico-8
-        document.getElementById("startEmulatorBtnPico8").addEventListener("click", function() {
-            startEmulator("Pico-8");
+        const emulatorButtons = document.querySelectorAll("[id^='startEmulatorBtn']");
+        const closeButton = document.getElementById("closeEmulatorBtn");
+        const emulatorContainer = document.getElementById("emulatorContainer");
+        const emulatorIframe = document.getElementById("emulatorIframe");
+        const bannerLeft = document.getElementById("bannerLeft");
+        const bannerRight = document.getElementById("bannerRight");
+
+        emulatorButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                startEmulator(button.textContent.replace('Iniciar ', ''));
+            });
         });
 
-        // Función para iniciar el emulador SNES
-        document.getElementById("startEmulatorBtnSNES").addEventListener("click", function() {
-            startEmulator("SNES");
-        });
-
-        // Función para iniciar el emulador GBA
-        document.getElementById("startEmulatorBtnGBA").addEventListener("click", function() {
-            startEmulator("GBA");
-        });
-
-        // Función para iniciar el emulador SEGA
-        document.getElementById("startEmulatorBtnSEGA").addEventListener("click", function() {
-            startEmulator("SEGA");
-        });
-
-        // Función para iniciar el emulador PSX
-        document.getElementById("startEmulatorBtnPSX").addEventListener("click", function() {
-            startEmulator("PSX");
-        });
-
-        // Función para iniciar el emulador N64
-        document.getElementById("startEmulatorBtnN64").addEventListener("click", function() {
-            startEmulator("N64");
-        });
-
-        // Función para cerrar el emulador
-        document.getElementById("closeEmulatorBtn").addEventListener("click", function() {
+        closeButton.addEventListener("click", function() {
             closeEmulator();
         });
 
-        // Función para iniciar o registrar el emulador
         function startEmulator(emulator) {
-            document.getElementById("emulatorContainer").style.display = "block";
-            document.getElementById("emulatorIframe").src = getEmulatorUrl(emulator);
-            document.getElementById("startEmulatorBtnPico8").style.display = "none";
-            document.getElementById("startEmulatorBtnSNES").style.display = "none";
-            document.getElementById("startEmulatorBtnGBA").style.display = "none";
-            document.getElementById("startEmulatorBtnSEGA").style.display = "none";
-            document.getElementById("startEmulatorBtnPSX").style.display = "none";
-            document.getElementById("startEmulatorBtnN64").style.display = "none";
-            document.getElementById("closeEmulatorBtn").style.display = "block";
-
-            // Enviar registro al servidor
+            emulatorContainer.style.display = "block";
+            emulatorIframe.src = getEmulatorUrl(emulator);
+            emulatorButtons.forEach(button => button.style.display = "none");
+            closeButton.style.display = "block";
+            bannerLeft.style.opacity = 0; /* Ocultar banner izquierdo */
+            bannerRight.style.opacity = 0; /* Ocultar banner derecho */
             sendEmulatorAction(emulator, 'open');
         }
 
-        // Función para cerrar el emulador
         function closeEmulator() {
-            document.getElementById("emulatorContainer").style.display = "none";
-            document.getElementById("emulatorIframe").src = "";
-            document.getElementById("startEmulatorBtnPico8").style.display = "block";
-            document.getElementById("startEmulatorBtnSNES").style.display = "block";
-            document.getElementById("startEmulatorBtnGBA").style.display = "block";
-            document.getElementById("startEmulatorBtnSEGA").style.display = "block";
-            document.getElementById("startEmulatorBtnPSX").style.display = "block";
-            document.getElementById("startEmulatorBtnN64").style.display = "block";
-            document.getElementById("closeEmulatorBtn").style.display = "none";
-
-            // Enviar registro al servidor
+            emulatorContainer.style.display = "none";
+            emulatorIframe.src = "";
+            emulatorButtons.forEach(button => button.style.display = "block");
+            closeButton.style.display = "none";
+            bannerLeft.style.opacity = 1; /* Mostrar banner izquierdo */
+            bannerRight.style.opacity = 1; /* Mostrar banner derecho */
             sendEmulatorAction(getActiveEmulator(), 'close');
         }
 
-        // Función para obtener la URL del emulador
         function getEmulatorUrl(emulator) {
             switch (emulator) {
                 case 'Pico-8':
@@ -160,26 +150,24 @@
             }
         }
 
-        // Función para obtener el emulador activo
         function getActiveEmulator() {
-            if (document.getElementById("emulatorIframe").src.includes("pico-8")) {
+            if (emulatorIframe.src.includes("pico-8")) {
                 return "Pico-8";
-            } else if (document.getElementById("emulatorIframe").src.includes("snes")) {
+            } else if (emulatorIframe.src.includes("snes")) {
                 return "SNES";
-            } else if (document.getElementById("emulatorIframe").src.includes("gba")) {
+            } else if (emulatorIframe.src.includes("gba")) {
                 return "GBA";
-            } else if (document.getElementById("emulatorIframe").src.includes("sega")) {
+            } else if (emulatorIframe.src.includes("sega")) {
                 return "SEGA";
-            } else if (document.getElementById("emulatorIframe").src.includes("ps1")) {
+            } else if (emulatorIframe.src.includes("ps1")) {
                 return "PSX";
-            } else if (document.getElementById("emulatorIframe").src.includes("n64")) {
+            } else if (emulatorIframe.src.includes("n64")) {
                 return "N64";
             } else {
                 return "";
             }
         }
 
-        // Función para enviar la acción del emulador al servidor
         function sendEmulatorAction(emulator, action) {
             fetch('/emulator-action', {
                 method: 'POST',
