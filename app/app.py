@@ -96,7 +96,7 @@ def send_welcome_email(to_email, username):
         <body>
             <h1>Hola {{ username }},</h1>
             <p>Gracias por registrarte en nuestra plataforma de juegos! Estamos emocionados de que te unas a nosotros.</p>
-            <p>Para disfrutar de los mejores juegos, por favor inicia sesión con tus datos.</p>
+            <p>Para disfrutar de los mejores juegos, por favor inicia sesión en nuestra pagina con tus datos.</p>
         </body>
     </html>
     """, username=username)
