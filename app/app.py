@@ -1,15 +1,28 @@
-from flask import Flask, render_template, redirect, url_for, request, session, flash, jsonify
+import os
+from flask import Flask, render_template, render_template_string, redirect, url_for, request, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+
+# Configuración de Flask-Mail con SendGrid
+app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'apikey'  # Esto sigue siendo 'apikey'
+app.config['MAIL_PASSWORD'] = os.getenv('SENDGRID_API_KEY')  # Cargar la API key desde una variable de entorno
+app.config['MAIL_DEFAULT_SENDER'] = ('EmuladordeJuegos', 'emuladorflask@gmail.com')
+
+mail = Mail(app)
 
 # Datos de usuarios (simulación sin base de datos)
 users = {
     'user1': {
         'username': 'user1',
         'email': 'user1@example.com',
-        'password': generate_password_hash('password1')  # Ejemplo de hash de contraseña
+        'password': generate_password_hash('password1')
     }
 }
 
@@ -40,8 +53,12 @@ def register():
         users[username] = {
             'username': username,
             'email': email,
-            'password': generate_password_hash(password)  # Ejemplo de hash de contraseña
+            'password': generate_password_hash(password)
         }
+        
+        # Enviar correo de bienvenida
+        send_welcome_email(email, username)
+
         flash('Registration successful. Please login.')
         return redirect(url_for('login'))
     
@@ -66,12 +83,30 @@ def emulator_action():
         emulator = data.get('emulator')
         action = data.get('action')
         
-        # Aquí deberías registrar esta acción en tu base de datos
-        # Ejemplo básico de impresión para propósitos de demostración
         print(f"Registro en la base de datos: Emulador {emulator} - Acción {action}")
-        
-        # Aquí podrías retornar una respuesta JSON, si fuera necesario
         return jsonify({'message': f'Emulador {emulator} {action} registrado correctamente'})
+
+# Función para enviar el correo de bienvenida
+def send_welcome_email(to_email, username):
+    msg = Message('Bienvenido a los mejores Emuladores de Juegos', recipients=[to_email])
+    
+    # Usar el cid (Content-ID) para referenciar la imagen en el HTML
+    msg.html = render_template_string("""
+    <html>
+        <body>
+            <h1>Hola {{ username }},</h1>
+            <p>Gracias por registrarte en nuestra plataforma de juegos! Estamos emocionados de que te unas a nosotros.</p>
+            <p>Para disfrutar de los mejores juegos, por favor inicia sesión con tus datos.</p>
+        </body>
+    </html>
+    """, username=username)
+    
+    with app.open_resource('static/icons/favicon.ico') as logo_file:
+        msg.attach('favicon.ico', 'image/x-icon', logo_file.read(), 'inline')
+
+    
+    msg.charset = 'utf-8'
+    mail.send(msg)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
